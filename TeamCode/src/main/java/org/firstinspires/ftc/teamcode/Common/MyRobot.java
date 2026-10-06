@@ -11,7 +11,9 @@ import com.seattlesolvers.solverslib.command.Robot;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Subsystems.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.FlowerServo;
+import org.firstinspires.ftc.teamcode.Subsystems.FollowerSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.LimelightSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.TransferSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.FlyWheelSubsystem;
 
@@ -26,6 +28,12 @@ public class MyRobot extends Robot {
 
     public final FlowerServo flowerServoSubsystem;
 
+    public LimelightSubsystem limelightSubsystem;
+    public FollowerSubsystem followerSubsystem;
+
+    private double driverAimAdjustment = 0;
+    private double driverAimAdjustmentLimelight = 0;
+
 
     public MyRobot(OpMode opMode) {
         this.opMode = opMode;
@@ -38,11 +46,31 @@ public class MyRobot extends Robot {
         intakeSubsystem =  new IntakeSubsystem(this);
         transferSubsystem = new TransferSubsystem(this);
         flyWheelSubsystem = new FlyWheelSubsystem(this);
+        limelightSubsystem = new LimelightSubsystem(this);
+        followerSubsystem = new FollowerSubsystem(this);
         scheduler.registerSubsystem(flowerServoSubsystem);
         scheduler.registerSubsystem(intakeSubsystem);
         scheduler.registerSubsystem(flyWheelSubsystem);
         scheduler.registerSubsystem(intakeSubsystem);
         scheduler.registerSubsystem(driveSubsystem);
+        scheduler.registerSubsystem(limelightSubsystem);
+        scheduler.registerSubsystem(followerSubsystem);
+    }
+
+    public double getDriverAimAdjustment(){
+        return this.driverAimAdjustment;
+    }
+
+    public void setDriverAimAdjustment(double aimAdjustment){
+        this.driverAimAdjustment = aimAdjustment;
+    }
+
+    public double getDriverAimAdjustmentLimelight(){
+        return this.driverAimAdjustmentLimelight;
+    }
+
+    public void setDriverAimAdjustmentLimelight(double aimAdjustment){
+        this.driverAimAdjustmentLimelight += aimAdjustment;
     }
 
     public Telemetry telemetry() {
