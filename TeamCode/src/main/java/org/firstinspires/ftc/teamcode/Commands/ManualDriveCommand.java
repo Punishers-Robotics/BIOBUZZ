@@ -20,7 +20,7 @@ public class ManualDriveCommand extends CommandBase {
     @Override
     public void execute() {
         Gamepad gamepad = robot.gamepad1();
-        driveSubsystem.arcadeDrive(-gamepad.left_stick_y, gamepad.right_stick_x);
+        driveSubsystem.arcadeDrive(gamepad.left_stick_y, -gamepad.right_stick_x);
     }
 
     @Override
