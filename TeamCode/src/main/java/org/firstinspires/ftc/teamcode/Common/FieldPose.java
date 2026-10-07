@@ -1,8 +1,15 @@
 package org.firstinspires.ftc.teamcode.Common;
 
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.MathFunctions;
 
 public class FieldPose {
+    // Pedro's own Pose.mirror(fieldLength) defaults to this value for the x-axis mirror
+    // (it represents the field's length/width in Pedro coordinates, since the FTC field is
+    // square). We reuse it for our own y-axis mirror below for the same reason.
+    private static final double FIELD_LENGTH = 141.5;
+    private static final double FIELD_WIDTH = 141.5;
+
     MyRobot robot;
 
     public FieldPose(MyRobot robot){
@@ -25,9 +32,19 @@ public class FieldPose {
         Pose resultingPose = pose;
 
         if (MatchState.getInstance().getAlliance() == Alliance.Red){
-            resultingPose = pose.mirror();
+            // This season's field requires mirroring across both axes (equivalent to a
+            // 180-degree rotation about the field center), not just the x-axis mirror that
+            // Pose.mirror() provides.
+            resultingPose = mirrorY(pose.mirror(FIELD_LENGTH), FIELD_WIDTH);
         }
 
         return resultingPose;
+    }
+
+    // Mirrors across a horizontal line at the given y-coordinate, flipping y and the heading.
+    // This is the y-axis counterpart to Pose.mirror(fieldLength), which only mirrors the x-axis.
+    private static Pose mirrorY(Pose pose, double fieldWidth){
+        return new Pose(pose.getX(), fieldWidth - pose.getY(),
+                MathFunctions.normalizeAngle(-pose.getHeading()));
     }
 }
