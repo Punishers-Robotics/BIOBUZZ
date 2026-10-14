@@ -1,24 +1,25 @@
 package org.firstinspires.ftc.teamcode.Common;
 
-import com.pedropathing.geometry.Pose;
-import com.pedropathing.math.MathFunctions;
+import com.pedropathing.api.PoseFactory;
+import com.pedropathing.math.Pose;
+import com.pedropathing.utils.Angle;
 
 public class FieldPose {
-    // Pedro's own Pose.mirror(fieldLength) defaults to this value for the x-axis mirror
-    // (it represents the field's length/width in Pedro coordinates, since the FTC field is
-    // square). We reuse it for our own y-axis mirror below for the same reason.
-    private static final double FIELD_LENGTH = 141.5;
-    private static final double FIELD_WIDTH = 141.5;
-
     MyRobot robot;
 
     public FieldPose(MyRobot robot){
         this.robot = robot;
     }
 
+    private static final double FIELD_LENGTH = 141.5;
+    private static final double FIELD_WIDTH = 141.5;
+    public static final PoseFactory BluePoses = PoseFactory.degrees();
+    public static final PoseFactory RedPoses =
+            BluePoses.mirrorX(FIELD_LENGTH / 2.0)
+            .mirrorY(FIELD_WIDTH / 2.0);
+
     // Field poses are defined in terms of the Blue Alliance and are mirrored automatically
-    // for Red via getPoseForAlliance(). This season's poses still need to be defined below;
-    // centerOfGoal() is kept as a working example of the pattern to follow.
+    // for Red via getPoseForAlliance().
     public static Pose centerOfGoal(){
         return getPoseForAlliance(new Pose(9, 134));
     }
@@ -29,22 +30,19 @@ public class FieldPose {
     // }
 
     private static Pose getPoseForAlliance(Pose pose){
-        Pose resultingPose = pose;
+        PoseFactory poseFactory =
+            MatchState.getInstance().getAlliance() == Alliance.Red ? RedPoses : BluePoses;
 
-        if (MatchState.getInstance().getAlliance() == Alliance.Red){
-            // This season's field requires mirroring across both axes (equivalent to a
-            // 180-degree rotation about the field center), not just the x-axis mirror that
-            // Pose.mirror() provides.
-            resultingPose = mirrorY(pose.mirror(FIELD_LENGTH), FIELD_WIDTH);
-        }
-
-        return resultingPose;
+        return poseFactory.of(pose.x(), pose.y(), pose.heading());
     }
 
     // Mirrors across a horizontal line at the given y-coordinate, flipping y and the heading.
     // This is the y-axis counterpart to Pose.mirror(fieldLength), which only mirrors the x-axis.
-    private static Pose mirrorY(Pose pose, double fieldWidth){
-        return new Pose(pose.getX(), fieldWidth - pose.getY(),
-                MathFunctions.normalizeAngle(-pose.getHeading()));
+    private static Pose mirrorY(Pose pose){
+        final double FIELD_WIDTH = 141.5;
+        return new Pose(
+                pose.x(),
+                FIELD_WIDTH - pose.y(),
+                Angle.normalize(-pose.heading()));
     }
 }
