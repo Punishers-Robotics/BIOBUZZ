@@ -1,5 +1,106 @@
 ## TeamCode Module
 
+### Pedro 3 drive testing and autonomous
+
+The project uses Pedro Pathing `revhub:3.0.1` and AutoTune `tuning:1.0.1`.
+Both Pedro test OpModes use SolversLib's command scheduler and a drive-only
+`PedroDriveSubsystem`. Its `periodic()` updates the follower once per scheduler
+loop. Commands require this subsystem, so manual driving and path following
+cannot control it simultaneously. STOP cancels commands, immediately zeros the
+drivetrain, and resets the scheduler.
+
+`AutoExcellence - Path Only` is a minimal port of the first near-goal drive
+segment from [OnWord-Robotics/punishers](https://github.com/OnWord-Robotics/punishers).
+It follows a straight Pedro path from `(23.66, 120.6, 140.95 degrees)` to
+`(62, 88.5, 130 degrees)` using a scheduled `CustomFollowerCommand`.
+Positions are in inches. It does not shoot or initialize `MyRobot` or any
+mechanism subsystems. The rest of the competition routine and the far-goal start
+are omitted. `PathManager` also supports curves with intermediate `Pose` control
+points using Pedro 3's `Paths.curve()` API.
+
+Required Robot Controller hardware names:
+
+- Four mecanum motors: `frontLeft`, `frontRight`, `rearLeft`, `rearRight`.
+- goBILDA Pinpoint: `pinpoint`, with two odometry pods.
+
+Before driving, verify `Common/PedroPathingConstants.java` against the actual robot.
+The inherited settings assume left motors reversed, right motors forward, 4-bar
+pods, a forward pod Y offset (`xPodOffset`) of 2.25 inches, and a strafe pod X
+offset (`yPodOffset`) of -5 inches. These are not measurements of BIOBUZZ.
+
+### AutoTune before autonomous
+
+Pedro 2's controller gains do not map directly to Pedro 3's Foresight algorithm.
+`FORESIGHT_TUNED` is deliberately `false`: autonomous/path commands refuse to run
+until the new values are measured. Manual TeleOp does not require Foresight tuning.
+The partial `foresightConfig` only supplies inherited natural decelerations needed
+to construct a follower for manual driving; it cannot run paths or hold position.
+
+Deploy the app and connect a browser to the Robot Controller's Wi-Fi. Open
+`http://192.168.43.1:10158` (use the RC's actual IP if different). AutoTune registers
+its temporary `Pedro Tuning` utility OpMode when a procedure runs; there is no
+separate static tuning OpMode to select.
+
+Run the registered procedures in this order:
+
+1. **Mecanum Tuner:** verify motor names/directions and paste the generated
+   `drivetrainConfig` into `PedroPathingConstants`.
+2. **Pinpoint Tuner:** measure pod directions/offsets/resolution and paste the
+   generated `localizerConfig` into the same file.
+3. Rebuild/deploy those hardware settings, then run **Foresight Tuner**. Copy its
+   Java-tab `foresightConfig` into the same file, add the generated code's imports
+   (`Controller`, `Matrix`, `Vector2D`), and set `FORESIGHT_TUNED` to `true`.
+   Rebuild/deploy again before selecting the autonomous.
+
+**AutoTune uses uncapped drivetrain power, including full-power measurements.**
+Raise the robot for motor-direction tests, and provide ample clear floor space
+for Foresight's driving/strafing/spinning tests and coast-down distance. The 30%
+cap described below applies only to the two Pedro test OpModes, not the tuners.
+Driver Station STOP aborts Foresight measurements rather than returning partial
+results, and the drivetrain is stopped on completion, cancellation, or error.
+
+### Pedro Drive TeleOp
+
+Select `Pedro Drive TeleOp`, INIT, then START. Gamepad 1 left stick controls
+forward/backward and strafing; right stick X controls turning. The default
+`PedroManualDriveCommand` sends robot-centric controls to `follower.manual()`.
+This OpMode needs only the four drive motors and Pinpoint, not the tank-drive
+motors or mechanisms. It resets the reported pose to `(0, 0, 0)` at START for
+relative localization testing; this is not an absolute field position or an
+autonomous-to-TeleOp pose handoff.
+
+The existing `Tank Drive TeleOp` is retained separately.
+
+### Running the autonomous
+
+Select the OpMode and press INIT. Release gamepad 1 D-pad left for Blue or right
+for Red, and confirm the displayed alliance/start/target before pressing START.
+Red uses BIOBUZZ's existing mirror across both field axes, not Punishers' original
+x-only mirror. Place the robot at the selected start pose and heading; initialization
+does not determine its physical location.
+
+Clear the entire path before starting. Both Pedro test OpModes are capped at
+30% wheel power (`TEST_MAX_POWER` in `PedroPathingConstants`), including combined
+translation/turn inputs and autonomous corrections. Pedro 3's path-speed
+constraint is also set to 30% for this segment; path speed is not a motor-power
+limit. The follower reports its pose and path status and stops driving on
+completion, STOP, interruption, or a 15-second timeout.
+`Finished` means Pedro ended the path; confirm the actual end position on the robot.
+Edit the two poses in `FieldPose` to experiment with the path and adjust power only
+after localization and tuning are verified.
+
+Build with `.\gradlew.bat :TeamCode:assembleDebug` using Android Studio's JDK and
+an installed Android SDK.
+
+### Imported tuning procedures
+
+The three procedures under `pedro/procedures` come from the official
+[Pedro-Pathing/Quickstart](https://github.com/Pedro-Pathing/Quickstart/tree/41158ec1ec7314a7cef1d6c9b9f21b380a6cb8e9/TeamCode/src/main/java/org/firstinspires/ftc/teamcode/pedro/procedures)
+at commit `41158ec1ec7314a7cef1d6c9b9f21b380a6cb8e9`. Their BSD license is retained
+in that directory. Local adaptations add reliable stop/finally handling for the
+motor-driving procedures and use Android-compatible list construction. Other
+localizers, drivetrain types, and competition mechanisms are not imported.
+
 Welcome!
 
 This module, TeamCode, is the place where you will write/paste the code for your team's
