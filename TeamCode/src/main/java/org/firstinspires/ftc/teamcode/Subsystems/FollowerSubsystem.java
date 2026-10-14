@@ -1,17 +1,40 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
-import com.pedropathing.math.Pose;
-import com.pedropathing.math.Velocity;
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Vector;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.teamcode.Common.FieldPose;
 import org.firstinspires.ftc.teamcode.Common.MyRobot;
+import org.firstinspires.ftc.teamcode.Common.PedroPathingConstants;
 
 
-public class FollowerSubsystem extends PedroDriveSubsystem {
+public class FollowerSubsystem extends SubsystemBase {
     MyRobot robot;
+    public Follower follower;
+
+    DcMotorEx frontLeft;
+    DcMotorEx frontRight;
+    DcMotorEx backLeft;
+    DcMotorEx backRight;
+    DcMotorEx turretFlyWheel;
+    DcMotorEx turretFlyWheel2;
+
+    LimelightSubsystem limelightSubsystem;
+    FollowerSubsystem followerSubsystem;
     public FollowerSubsystem(MyRobot robot){
-        super(robot.hardwareMap(), robot.telemetry(), 1);
         this.robot = robot;
+        this.followerSubsystem = robot.followerSubsystem;
+        this.limelightSubsystem = robot.limelightSubsystem;
+        follower = PedroPathingConstants.createFollower(robot.hardwareMap());
+        frontLeft = robot.hardwareMap().get(DcMotorEx.class, "frontLeft");
+        frontRight = robot.hardwareMap().get(DcMotorEx.class, "frontRight");
+        backLeft =  robot.hardwareMap().get(DcMotorEx.class, "rearLeft");
+        backRight = robot.hardwareMap().get(DcMotorEx.class, "rearRight");
+        turretFlyWheel = robot.hardwareMap().get(DcMotorEx.class, "flywheelMotor");
+        turretFlyWheel2 = robot.hardwareMap().get(DcMotorEx.class, "turretFlyWheel2");
         robot.telemetry().addData("follower: ", follower);
         robot.telemetry().update();
         // DO NOT set the starting pose here since it must only be set once in the OpMode to
@@ -19,11 +42,11 @@ public class FollowerSubsystem extends PedroDriveSubsystem {
     }
 
     public Pose getPredictedPoseForShot() {
-        Pose pose = follower.pose();
-        Velocity velocity = follower.velocity();
+        Pose pose = follower.getPose();
+        Vector velocity = follower.getVelocity();
 
-        double dx = FieldPose.centerOfGoal().x() - pose.x();
-        double dy = FieldPose.centerOfGoal().y() - pose.y();
+        double dx = FieldPose.centerOfGoal().getX() - pose.getX();
+        double dy = FieldPose.centerOfGoal().getY() - pose.getY();
         double distance = Math.hypot(dx, dy);
 
         if (distance < 20) {
@@ -32,24 +55,24 @@ public class FollowerSubsystem extends PedroDriveSubsystem {
         else {
             double timeOfFlight = getTimeOfFlight();
 
-            double vx = velocity.vx;
-            double vy = velocity.vy;
+            double vx = velocity.getXComponent();
+            double vy = velocity.getYComponent();
 
-            double angularVelocity = velocity.omega;
+            double angularVelocity = follower.getAngularVelocity();
 
             double dx_robot = vx * timeOfFlight;
             double dy_robot = vy * timeOfFlight;
             double headingVelocityVector = angularVelocity * 0.135;
             //sets new predicted pose
-            return new Pose(pose.x() + dx_robot, pose.y() + dy_robot,
-                    headingVelocityVector + pose.heading()
+            return new Pose(pose.getX() + dx_robot, pose.getY() + dy_robot,
+                    headingVelocityVector + pose.getHeading()
             );
         }
     }
     public double getDistanceToGoal() {
         Pose predicted = getPredictedPoseForShot();
-        double dxPrediction = FieldPose.centerOfGoal().x() - predicted.x();
-        double dyPrediction = FieldPose.centerOfGoal().y() - predicted.y();
+        double dxPrediction = FieldPose.centerOfGoal().getX() - predicted.getX();
+        double dyPrediction = FieldPose.centerOfGoal().getY() - predicted.getY();
         return Math.hypot(dxPrediction, dyPrediction);
     }
 
@@ -58,9 +81,9 @@ public class FollowerSubsystem extends PedroDriveSubsystem {
         //Uses the new predicted pose for calculation
         Pose predicted = getPredictedPoseForShot();
 
-        double dxPrediction = FieldPose.centerOfGoal().x() - predicted.x();
-        double dyPrediction = FieldPose.centerOfGoal().y() - predicted.y();
-                double robotHeadingRad = predicted.heading();
+        double dxPrediction = FieldPose.centerOfGoal().getX() - predicted.getX();
+        double dyPrediction = FieldPose.centerOfGoal().getY() - predicted.getY();
+                double robotHeadingRad = predicted.getHeading();
 
         //Finds angle to goal
         double fieldAngleRad = Math.atan2(dyPrediction, dxPrediction);
@@ -79,9 +102,9 @@ public class FollowerSubsystem extends PedroDriveSubsystem {
     }
 
     private double getTimeOfFlight() {
-        Pose pose = follower.pose();
-        double dx = FieldPose.centerOfGoal().x() - pose.x();
-        double dy = FieldPose.centerOfGoal().y() - pose.y();
+        Pose pose = follower.getPose();
+        double dx = FieldPose.centerOfGoal().getX() - pose.getX();
+        double dy = FieldPose.centerOfGoal().getY() - pose.getY();
         double distance = Math.hypot(dx, dy);
         return (0.00115231 * distance + 0.400983) + 0.195;
     }
@@ -94,8 +117,21 @@ public class FollowerSubsystem extends PedroDriveSubsystem {
 
     @Override
     public void periodic() {
-        super.periodic();
+        follower.update();
+
+        Pose currentPose = follower.getPose();
+//        robot.telemetry().addData("frontLeft draw :",frontLeft.getCurrent(CurrentUnit.AMPS));
+//        robot.telemetry().addData("frontRight draw :",frontRight.getCurrent(CurrentUnit.AMPS));
+//        robot.telemetry().addData("rearLeft draw :", backLeft.getCurrent(CurrentUnit.AMPS));
+//        robot.telemetry().addData("rearRight draw :", backRight.getCurrent(CurrentUnit.AMPS));
+       // robot.telemetry().addData("Flywheel draw :",turretFlyWheel.getCurrent(CurrentUnit.AMPS));
+        //robot.telemetry().addData("Flywheel2 draw :",turretFlyWheel2.getCurrent(CurrentUnit.AMPS));
+
         robot.telemetry().addData("Current degrees: ", getAngleToGoal());
+
+        robot.telemetry().addData("Current X: ", currentPose.getX());
+        robot.telemetry().addData("Current Y: ", currentPose.getY());
+        robot.telemetry().addData("Current Heading: ", currentPose.getHeading());
         robot.telemetry().update();
     }
 }

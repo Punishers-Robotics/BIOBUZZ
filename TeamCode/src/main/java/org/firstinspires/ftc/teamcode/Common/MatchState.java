@@ -1,9 +1,5 @@
 package org.firstinspires.ftc.teamcode.Common;
 
-import com.qualcomm.robotcore.hardware.Gamepad;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
-
 public class MatchState {
 
     private static MatchState instance;
@@ -22,19 +18,15 @@ public class MatchState {
     }
 
     public void initializeForMatchWithGamepad(MyRobot robot) {
-        initializeForMatchWithGamepad(robot.gamepad1(), robot.telemetry());
-        robot.telemetry().update();
-    }
-
-    public void initializeForMatchWithGamepad(Gamepad gamepad, Telemetry telemetry) {
-        if (gamepad.dpadLeftWasReleased()) {
+        if (robot.gamepad1().dpadLeftWasReleased()) {
             alliance = Alliance.Blue;
         }
-        if (gamepad.dpadRightWasReleased()) {
+        if (robot.gamepad1().dpadRightWasReleased()) {
             alliance = Alliance.Red;
         }
 
-        telemetry.addData("Alliance: ", alliance);
+        robot.telemetry().addData("Alliance: ", alliance);
+        robot.telemetry().update();
     }
 
     public Alliance getAlliance() {
