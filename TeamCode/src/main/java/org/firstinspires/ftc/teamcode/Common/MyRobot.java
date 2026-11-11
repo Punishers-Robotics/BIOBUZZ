@@ -54,7 +54,7 @@ public class MyRobot extends Robot {
         scheduler.registerSubsystem(intakeSubsystem);
         scheduler.registerSubsystem(driveSubsystem);
         scheduler.registerSubsystem(limelightSubsystem);
-        scheduler.registerSubsystem(followerSubsystem);
+        //scheduler.registerSubsystem(followerSubsystem);
     }
 
     public double getDriverAimAdjustment(){

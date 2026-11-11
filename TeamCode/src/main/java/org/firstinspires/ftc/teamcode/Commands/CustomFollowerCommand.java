@@ -19,18 +19,18 @@ public class CustomFollowerCommand extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         if (interrupted) {
-            robot.followerSubsystem.follower.breakFollowing();
+            //robot.followerSubsystem.follower.breakFollowing();
         }
     }
 
 
     @Override
     public void initialize() {
-        robot.followerSubsystem.follower.followPath(pathChain, power, true);
+        //robot.followerSubsystem.follower.followPath(pathChain, power, true);
     }
 
-    @Override
-    public boolean isFinished() {
-        return !robot.followerSubsystem.follower.isBusy();
+   // @Override
+    //public boolean isFinished() {
+        //return !robot.followerSubsystem.follower.isBusy();
     }
-}
+//}

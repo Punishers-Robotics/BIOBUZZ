@@ -8,7 +8,7 @@ import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.teamcode.Common.FieldPose;
 import org.firstinspires.ftc.teamcode.Common.MyRobot;
-import org.firstinspires.ftc.teamcode.Common.PedroPathingConstants;
+//import org.firstinspires.ftc.teamcode.Common.PedroPathingConstants;
 
 
 public class FollowerSubsystem extends SubsystemBase {
@@ -26,15 +26,15 @@ public class FollowerSubsystem extends SubsystemBase {
     FollowerSubsystem followerSubsystem;
     public FollowerSubsystem(MyRobot robot){
         this.robot = robot;
-        this.followerSubsystem = robot.followerSubsystem;
+        //this.followerSubsystem = robot.followerSubsystem;
         this.limelightSubsystem = robot.limelightSubsystem;
-        follower = PedroPathingConstants.createFollower(robot.hardwareMap());
-        frontLeft = robot.hardwareMap().get(DcMotorEx.class, "frontLeft");
-        frontRight = robot.hardwareMap().get(DcMotorEx.class, "frontRight");
-        backLeft =  robot.hardwareMap().get(DcMotorEx.class, "rearLeft");
-        backRight = robot.hardwareMap().get(DcMotorEx.class, "rearRight");
-        turretFlyWheel = robot.hardwareMap().get(DcMotorEx.class, "flywheelMotor");
-        turretFlyWheel2 = robot.hardwareMap().get(DcMotorEx.class, "turretFlyWheel2");
+        //follower = PedroPathingConstants.createFollower(robot.hardwareMap());
+//        frontLeft = robot.hardwareMap().get(DcMotorEx.class, "frontLeft");
+//        frontRight = robot.hardwareMap().get(DcMotorEx.class, "frontRight");
+//        backLeft =  robot.hardwareMap().get(DcMotorEx.class, "rearLeft");
+//        backRight = robot.hardwareMap().get(DcMotorEx.class, "rearRight");
+//        turretFlyWheel = robot.hardwareMap().get(DcMotorEx.class, "flywheelMotor");
+//        turretFlyWheel2 = robot.hardwareMap().get(DcMotorEx.class, "turretFlyWheel2");
         robot.telemetry().addData("follower: ", follower);
         robot.telemetry().update();
         // DO NOT set the starting pose here since it must only be set once in the OpMode to
