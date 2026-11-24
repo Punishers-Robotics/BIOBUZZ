@@ -1,3 +1,10 @@
+## BIOBUZZ portfolio
+
+Start at [doc/team](doc/team/README.md) for student documentation. Markdown
+records describe the team's current work and evidence; the separate
+[portfolio](doc/team/portfolio/README.md) uses Typst to build a curated printable
+PDF locally and in GitHub Actions, independently of the Android robot application.
+
 ## NOTICE
 
 This repository contains the public FTC SDK for the DECODE (2025-2026) competition season.
