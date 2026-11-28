@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.math.Pose;
-import com.pedropathing.math.Vector;
+import com.pedropathing.math.Velocity;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
@@ -43,32 +43,32 @@ public class FollowerSubsystem extends SubsystemBase {
     }
 
     public Pose getPredictedPoseForShot() {
-        Pose pose = follower.getPose();
-        Vector velocity = follower.getVelocity();
+        Pose pose = follower.pose();
+        Velocity velocity = follower.velocity();
 
-        double dx = fieldPose.getGoalPose().getX() - pose.getX();
-        double dy = fieldPose.getGoalPose().getY() - pose.getY();
+        double dx = fieldPose.getGoalPose().x() - pose.x();
+        double dy = fieldPose.getGoalPose().y() - pose.y();
         double distance = Math.hypot(dx, dy);
 
             double timeOfFlight = getTimeOfFlight();
 
-            double vx = velocity.getXComponent();
-            double vy = velocity.getYComponent();
+            double vx = velocity.vx;
+            double vy = velocity.vy;
 
-            double angularVelocity = follower.getAngularVelocity();
+            double angularVelocity = velocity.omega;
 
             double dx_robot = vx * timeOfFlight;
             double dy_robot = vy * timeOfFlight;
             double headingVelocityVector = angularVelocity * 0.135;
             //sets new predicted pose
-            return new Pose(pose.getX() + dx_robot, pose.getY() + dy_robot,
-                    headingVelocityVector + pose.getHeading()
+            return new Pose(pose.x() + dx_robot, pose.y() + dy_robot,
+                    headingVelocityVector + pose.heading()
             );
     }
     public double getDistanceToGoal() {
         Pose predicted = getPredictedPoseForShot();
-        double dxPrediction = fieldPose.getGoalPose().getX() - predicted.getX();
-        double dyPrediction = fieldPose.getGoalPose().getY() - predicted.getY();
+        double dxPrediction = fieldPose.getGoalPose().x() - predicted.x();
+        double dyPrediction = fieldPose.getGoalPose().y() - predicted.y();
         return Math.hypot(dxPrediction, dyPrediction);
     }
 
@@ -77,9 +77,9 @@ public class FollowerSubsystem extends SubsystemBase {
 
         //Uses the new predicted pose for calculation
         Pose predicted = getPredictedPoseForShot();
-        double dxPrediction = fieldPose.getGoalPose().getX() - predicted.getX();
-        double dyPrediction = fieldPose.getGoalPose().getY() - predicted.getY();
-                double robotHeadingRad = predicted.getHeading();
+        double dxPrediction = fieldPose.getGoalPose().x() - predicted.x();
+        double dyPrediction = fieldPose.getGoalPose().y() - predicted.y();
+        double robotHeadingRad = predicted.heading();
 
         //Finds angle to goal
         double fieldAngleRad = Math.atan2(dyPrediction, dxPrediction);
@@ -98,9 +98,9 @@ public class FollowerSubsystem extends SubsystemBase {
     }
 
     private double getTimeOfFlight() {
-        Pose pose = follower.getPose();
-        double dx = fieldPose.getGoalPose().getX() - pose.getX();
-        double dy = fieldPose.getGoalPose().getY() - pose.getY();
+        Pose pose = follower.pose();
+        double dx = fieldPose.getGoalPose().x() - pose.x();
+        double dy = fieldPose.getGoalPose().y() - pose.y();
         double distance = Math.hypot(dx, dy);
         return (0.00115231 * distance + 0.400983)-0.1;
     }
@@ -115,7 +115,7 @@ public class FollowerSubsystem extends SubsystemBase {
     public void periodic() {
         follower.update();
 
-        Pose currentPose = follower.getPose();
+        Pose currentPose = follower.pose();
 //        robot.telemetry().addData("frontLeft draw :",frontLeft.getCurrent(CurrentUnit.AMPS));
 //        robot.telemetry().addData("frontRight draw :",frontRight.getCurrent(CurrentUnit.AMPS));
 //        robot.telemetry().addData("rearLeft draw :", backLeft.getCurrent(CurrentUnit.AMPS));

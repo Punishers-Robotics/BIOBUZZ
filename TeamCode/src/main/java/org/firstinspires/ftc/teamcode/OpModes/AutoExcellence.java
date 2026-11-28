@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.seattlesolvers.solverslib.command.Command;
@@ -43,7 +43,7 @@ public class AutoExcellence extends LinearOpMode {
         }
 
         follower = robot.followerSubsystem.follower;
-        follower.setStartingPose(matchState.getStartingPose());
+        follower.setPose(matchState.getStartingPose());
         PathManager pathManager = new PathManager(robot, matchState.getStartingPose());
 
         waitForStart();
@@ -135,7 +135,7 @@ public class AutoExcellence extends LinearOpMode {
 
         while (opModeIsActive()) {
             scheduler.run();
-            telemetry.addData("Pose", follower.getPose());
+            telemetry.addData("Pose", follower.pose());
             telemetry.addData("Initial score pose", getInitialScorePose());
             telemetry.update();
         }

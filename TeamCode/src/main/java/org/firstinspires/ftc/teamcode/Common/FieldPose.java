@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.teamcode.Common;
 
-import android.graphics.Point;
-
-import com.pedropathing.geometry.Pose;
+import com.pedropathing.api.PoseFactory;
+import com.pedropathing.math.Pose;
 
 public class FieldPose {
+    private static final PoseFactory RED_ALLIANCE_POSES = PoseFactory.radians().mirrorX(70.75);
+
     MyRobot robot;
 
     public FieldPose(MyRobot robot){
@@ -13,7 +14,7 @@ public class FieldPose {
 
     // Field poses are defined for Blue and mirrored automatically for Red.
     public Pose getGoalPose(){
-        if (robot.followerSubsystem.follower.getPose().getY() > 70.5){
+        if (robot.followerSubsystem.follower.pose().y() > 70.5){
             return getPoseForAlliance(new Pose(82
                     , 98));
         }
@@ -80,7 +81,7 @@ public class FieldPose {
         Pose resultingPose = pose;
 
         if (MatchState.getInstance().getAlliance() == Alliance.Red){
-            resultingPose = pose.mirror();
+            resultingPose = RED_ALLIANCE_POSES.of(pose.x(), pose.y(), pose.heading());
         }
 
         return resultingPose;

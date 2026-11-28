@@ -29,17 +29,16 @@ public class ManualDriveFollowerCommand extends CommandBase {
         }
 
         double allianceFactor = MatchState.getInstance().getAlliance() == Alliance.Red ? -1 : 1;
-        followerSubsystem.follower.setTeleOpDrive(
+        followerSubsystem.follower.manual(
                 -gamepad1.left_stick_y * allianceFactor,
                 -gamepad1.left_stick_x * allianceFactor,
-                rotation,
-                false
+                rotation
         );
     }
 
     @Override
     public void end(boolean interrupted) {
-        followerSubsystem.follower.setTeleOpDrive(0, 0, 0, false);
+        followerSubsystem.follower.manual(0, 0, 0);
         followerSubsystem.follower.update();
     }
 }

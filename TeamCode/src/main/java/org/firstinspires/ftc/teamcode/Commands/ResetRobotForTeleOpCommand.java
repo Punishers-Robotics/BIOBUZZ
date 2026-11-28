@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.Commands;
 
-import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Pose;
 import com.seattlesolvers.solverslib.command.CommandBase;
 
 import org.firstinspires.ftc.teamcode.Common.MatchState;
@@ -17,10 +17,10 @@ public class ResetRobotForTeleOpCommand extends CommandBase {
     @Override
     public void execute() {
         robot.useFixedTurret = true;
-        robot.followerSubsystem.follower.setTeleOpDrive(0, 0, 0);
+        robot.followerSubsystem.follower.manual(0, 0, 0);
         robot.followerSubsystem.follower.update();
 
-        Pose finalPose = robot.followerSubsystem.follower.getPose().copy();
+        Pose finalPose = robot.followerSubsystem.follower.pose();
         MatchState.getInstance().setStartingPose(finalPose);
         robot.telemetry().addData("Ending pose", finalPose);
     }

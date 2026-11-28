@@ -2,7 +2,7 @@ package org.firstinspires.ftc.teamcode.TestOpModes;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Pose;
 
 import org.firstinspires.ftc.teamcode.Common.MyRobot;
 import org.firstinspires.ftc.teamcode.Subsystems.TurretRotationSubsystem;
@@ -21,7 +21,7 @@ public class TestTurretPIDTuning extends OpMode {
     @Override
     public void init() {
         robot = new MyRobot(this);
-        robot.followerSubsystem.follower.setStartingPose(new Pose(81, 9, Math.toRadians(90)));
+        robot.followerSubsystem.follower.setPose(new Pose(81, 9, Math.toRadians(90)));
         turretRotationSubsystem = robot.turretRotationSubsystem;
     }
 

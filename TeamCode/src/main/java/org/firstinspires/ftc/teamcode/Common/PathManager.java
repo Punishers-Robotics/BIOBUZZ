@@ -1,16 +1,9 @@
 package org.firstinspires.ftc.teamcode.Common;
 
-import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.api.Paths;
 import com.pedropathing.math.Pose;
 import com.pedropathing.paths.Path;
-import com.pedropathing.paths.PathChain;
-import com.pedropathing.geometry.BezierCurve;
-import com.pedropathing.geometry.BezierPoint;
 import org.firstinspires.ftc.teamcode.Commands.CustomFollowerCommand;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class PathManager {
 
@@ -26,70 +19,36 @@ public class PathManager {
     public CustomFollowerCommand createFollowPathCommand(Pose targetPose) {
         return createFollowPathCommandWithPower(targetPose, 1);
     }
-    public CustomFollowerCommand createFollowCurveCommand(Pose targetPose, BezierPoint... controlPoints) {
+    public CustomFollowerCommand createFollowCurveCommand(Pose targetPose, Pose... controlPoints) {
         return createFollowCurveCommandWithPower(targetPose, 1, controlPoints);
     }
 
     public CustomFollowerCommand createFollowCurveCommandWithPower(
             Pose targetPose,
-            double maxPower,
-            BezierPoint... controlPoints
+            double speedScale,
+            Pose... controlPoints
     ) {
         Pose startPose = lastTargetPose;
+        Pose[] poses = new Pose[controlPoints.length + 2];
+        poses[0] = startPose;
+        System.arraycopy(controlPoints, 0, poses, 1, controlPoints.length);
+        poses[poses.length - 1] = targetPose;
+        Path path = withSpeedScale(Paths.curve(poses).linear(startPose, targetPose), speedScale);
         lastTargetPose = targetPose;
-
-        // Build Pose control point list: start + user points + end
-        List<Pose> poses = new ArrayList<>();
-
-        // Start pose
-        poses.add(new Pose(startPose.getX(), startPose.getY(), startPose.getHeading()));
-
-        // Middle control points (convert BezierPoint → Pose)
-        for (BezierPoint cp : controlPoints) {
-            poses.add(new Pose(cp.getPose(0).getX(), cp.getPose(0).getY()));
-        }
-
-        // End pose
-        poses.add(new Pose(targetPose.getX(), targetPose.getY(), targetPose.getHeading()));
-
-        // Build the curve using the correct constructor
-        BezierCurve curve = new BezierCurve(poses);
-
-
-        // Build the path and return the command
-        return new CustomFollowerCommand(
-                robot,
-                robot.followerSubsystem.follower.pathBuilder()
-                        .addPath(curve)
-                        .setLinearHeadingInterpolation(
-
-                                startPose.getHeading(),
-                                targetPose.getHeading()
-                        )
-                        .setGlobalDeceleration(0.2)
-                        .build(),
-
-                maxPower
-        );
+        return new CustomFollowerCommand(robot, path);
     }
 
-
-
-
-    public CustomFollowerCommand createFollowPathCommandWithPower(Pose targetPose, double maxPower){
+    public CustomFollowerCommand createFollowPathCommandWithPower(Pose targetPose, double speedScale) {
         Pose startPose = lastTargetPose;
+        Path path = withSpeedScale(Paths.line(startPose, targetPose).linear(startPose, targetPose), speedScale);
         lastTargetPose = targetPose;
+        return new CustomFollowerCommand(robot, path);
+    }
 
-
-
-        return new CustomFollowerCommand(
-                robot,
-                robot.followerSubsystem.follower.pathBuilder()
-                        .addPath(new BezierLine(startPose, targetPose))
-                        .setLinearHeadingInterpolation(startPose.getHeading(), targetPose.getHeading())
-                        .setGlobalDeceleration(0.2)
-                        .build(),
-                maxPower);
-
+    private Path withSpeedScale(Path path, double speedScale) {
+        if (!(speedScale > 0) || speedScale > 1) {
+            throw new IllegalArgumentException("speedScale must be greater than 0 and at most 1");
+        }
+        return path.with(PedroPathingConstants.foresightConstants.maxPathSpeed.at(speedScale));
     }
 }

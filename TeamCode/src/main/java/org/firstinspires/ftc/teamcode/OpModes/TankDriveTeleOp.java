@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
-import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.seattlesolvers.solverslib.command.CommandScheduler;
@@ -23,9 +23,9 @@ public class TankDriveTeleOp extends OpMode {
     public void init() {
         robot = new MyRobot(this);
 
-        robot.followerSubsystem.follower.setStartingPose(new Pose(81,9,Math.toRadians(90)));
+        robot.followerSubsystem.follower.setPose(new Pose(81, 9, Math.toRadians(90)));
 
-        robot.followerSubsystem.follower.startTeleopDrive();
+        robot.followerSubsystem.follower.manual(0, 0, 0);
 
         CommandScheduler.getInstance().setDefaultCommand(
                 robot.followerSubsystem,
@@ -46,9 +46,9 @@ public class TankDriveTeleOp extends OpMode {
     @Override
     public void loop() {
         CommandScheduler.getInstance().run();
-        robot.telemetry().addData("Heading reading", robot.followerSubsystem.follower.getPose().getHeading());
-        robot.telemetry().addData("X reading", robot.followerSubsystem.follower.getPose().getX());
-        robot.telemetry().addData("Y reading", robot.followerSubsystem.follower.getPose().getY());
+        robot.telemetry().addData("Heading reading", robot.followerSubsystem.follower.pose().heading());
+        robot.telemetry().addData("X reading", robot.followerSubsystem.follower.pose().x());
+        robot.telemetry().addData("Y reading", robot.followerSubsystem.follower.pose().y());
         robot.telemetry().update();
     }
 
