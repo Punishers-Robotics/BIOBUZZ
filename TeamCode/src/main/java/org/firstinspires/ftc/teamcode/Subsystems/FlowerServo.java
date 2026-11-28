@@ -12,9 +12,9 @@ public class FlowerServo extends SubsystemBase {
         flowerServo = robot.hardwareMap().get(Servo.class,"flowerServo");
     }
     public void setFlowerServoOpen(){
-        flowerServo.setPosition(0.595);
+        flowerServo.setPosition(0);
     }
     public void setFlowerServoClose(){
-        flowerServo.setPosition(0.2);
+        flowerServo.setPosition(0.28);
     }
 }

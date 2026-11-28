@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.Commands;
 
 import com.seattlesolvers.solverslib.command.CommandBase;
-import com.seattlesolvers.solverslib.command.WaitCommand;
 
 import org.firstinspires.ftc.teamcode.Common.MyRobot;
 import org.firstinspires.ftc.teamcode.Subsystems.TransferSubsystem;
@@ -18,8 +17,13 @@ public class ShootCommand extends CommandBase {
 
     @Override
     public void execute() {
+        robot.isShooting = true;
         transferSubsystem.setTransferMotor();
-        new WaitCommand(3000);
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        robot.isShooting = false;
         transferSubsystem.stopTransferMotor();
     }
 }

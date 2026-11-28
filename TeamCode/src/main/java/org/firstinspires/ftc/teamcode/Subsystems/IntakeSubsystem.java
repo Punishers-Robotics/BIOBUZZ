@@ -11,7 +11,7 @@ public class IntakeSubsystem extends SubsystemBase {
         intakeMotor = robot.hardwareMap().get(DcMotorEx.class,"intakeMotor");
     }
     public void setIntakeMotor(){
-        intakeMotor.setPower(-0.45);
+        intakeMotor.setPower(0.9);
     }
 
     public void periodic(){

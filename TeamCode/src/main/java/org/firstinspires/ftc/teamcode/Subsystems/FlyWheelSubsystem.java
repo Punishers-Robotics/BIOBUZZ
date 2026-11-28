@@ -1,42 +1,38 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.seattlesolvers.solverslib.command.SubsystemBase;
 
 import org.firstinspires.ftc.teamcode.Common.MyRobot;
 
 public class FlyWheelSubsystem extends SubsystemBase {
-    DcMotorEx flyWheelMotor;
-    MyRobot robot;
-    FollowerSubsystem followerSubsystem;
-    private double flywheelIncrement = 0;
-    double rawFlywheelSpeed;
-    PIDFCoefficients pidfCoefficients;
-    public FlyWheelSubsystem(MyRobot robot){
-        flyWheelMotor = robot.hardwareMap().get(DcMotorEx.class,"flyWheelMotor");
-        this.followerSubsystem=new FollowerSubsystem(robot);
+    private final DcMotorEx flyWheelMotor;
+    private final MyRobot robot;
+
+    public FlyWheelSubsystem(MyRobot robot) {
         this.robot = robot;
-        new PIDFCoefficients(0,0,0,0);
+        flyWheelMotor = robot.hardwareMap().get(DcMotorEx.class, "flyWheelMotor");
+        flyWheelMotor.setVelocityPIDFCoefficients(114.7,0,0,18.717);
+    }
 
+    public double getFlywheelSpeed() {
+        double distanceToGoal = robot.followerSubsystem.getDistanceToGoal();
+        double calculatedSpeed =
+                0.015022 * Math.pow(distanceToGoal, 3)
+                        - 2.29936 * Math.pow(distanceToGoal, 2)
+                        + 113.28757 * distanceToGoal
+                        - 994.32745;
+        return Math.max(0, calculatedSpeed);
     }
-    public void getFlywheelSpeed(){
-        double distanceToGoal = followerSubsystem.getDistanceToGoal();
-        rawFlywheelSpeed =
-            0.000156599 * (Math.pow(distanceToGoal, 3) -
-            0.0145812 * Math.pow(distanceToGoal, 2) +
-            6.39732 * distanceToGoal + 1139.12912);
-    }
+
     public void setFlywheelMotor() {
-        if (robot.gamepad1().dpadUpWasPressed()) {
-            flywheelIncrement += 0.1;
-        } else if (robot.gamepad1().dpadDownWasPressed()) {
-            flywheelIncrement -= 0.1;
-        }
-        flyWheelMotor.setPower(-flywheelIncrement);
+        flyWheelMotor.setVelocity(-getFlywheelSpeed());
     }
 
-    public void periodic(){
+    @Override
+    public void periodic() {
+        robot.telemetry().addData("Flywheel velocity", flyWheelMotor.getVelocity());
+        robot.telemetry().addData("Flywheel target velocity", -getFlywheelSpeed());
         setFlywheelMotor();
     }
 }
